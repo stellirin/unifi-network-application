@@ -3,7 +3,6 @@ kind: ConfigMap
 metadata:
   namespace: unifi
   name: unifi-mongodb-initdb
-
 data:
 
   # Script to init the MongoDB database

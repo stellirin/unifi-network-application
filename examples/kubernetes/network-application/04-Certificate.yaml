@@ -1,0 +1,18 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  namespace: unifi
+  name: unifi
+spec:
+  secretName: unifi-certificate
+  commonName: "unifi.example.com"
+  dnsNames:
+    - "unifi.example.com"
+  issuerRef:
+    name: letsencrypt
+    # We can reference ClusterIssuers by changing the kind here.
+    # The default value is Issuer (i.e. a locally namespaced Issuer)
+    kind: ClusterIssuer
+    # This is optional since cert-manager will default to this value however
+    # if you are using an external issuer, change this to that issuer group.
+    group: cert-manager.io

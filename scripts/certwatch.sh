@@ -13,5 +13,5 @@ do
     HASH_CHECK=$?
 done
 
-# We get here because the TLS certificates changed, so trigger a controller restart
+# We get here because the TLS certificates changed, so trigger a container restart
 java -jar ${BASEDIR}/lib/ace.jar stop

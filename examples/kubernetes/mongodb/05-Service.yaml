@@ -5,7 +5,6 @@ metadata:
   name: mongodb
   labels:
     app: mongodb
-
 spec:
   type: ClusterIP
   selector:

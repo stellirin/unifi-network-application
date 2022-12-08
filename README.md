@@ -1,16 +1,19 @@
-# UniFi Network Controller
+# UniFi Network Application
 
-The UniFi® Software-Defined Networking (SDN) platform is an end-to-end system of network devices across different locations — all controlled from a single interface.
+Build powerful home and enterprise networks with high-performance UniFi Switches, Gateways, and Wireless Access Points. Monitor client usage, set custom traffic rules, and much more.
 
 ## Supported tags and respective `Dockerfile` links
 
-- [`latest`](https://github.com/stellirin/unifi-controller/blob/main/Dockerfile)
-- [`7.2, 7.2.95`](https://github.com/stellirin/unifi-controller/blob/v7.2.92/Dockerfile)
+- [`latest`](https://github.com/stellirin/unifi-network-application/blob/main/Dockerfile)
+- [`7.3, 7.3.76`](https://github.com/stellirin/unifi-network-application/blob/v7.3.76/Dockerfile)
 
 NOTE: `latest` may contain a beta release. If you wish for stability use a specific tag!
 
 ## Unsupported tags
 
+*Earlier versions were known as UniFi Network Controller*
+
+- [`7.2, 7.2.95`](https://github.com/stellirin/unifi-controller/blob/v7.2.95/Dockerfile)
 - [`7.2.92`](https://github.com/stellirin/unifi-controller/blob/v7.2.92/Dockerfile)
 - [`7.2.91`](https://github.com/stellirin/unifi-controller/blob/v7.2.91/Dockerfile)
 - [`7.1, 7.1.68`](https://github.com/stellirin/unifi-controller/blob/v7.1.68/Dockerfile)
@@ -30,21 +33,17 @@ NOTE: `latest` may contain a beta release. If you wish for stability use a speci
 ## Quick reference
 
 - **Where to get help**: [The UniFi Community Forums](https://community.ui.com/)
-- **Where to file issues**: [https://github.com/stellirin/unifi-controller/issues](https://github.com/stellirin/unifi-controller/issues)
-- **Maintained by**: [Adam Farden](https://github.com/stellirin/unifi-controller)
+- **Where to file issues**: [https://github.com/stellirin/unifi-network-application/issues](https://github.com/stellirin/unifi-network-application/issues)
+- **Maintained by**: [Adam Farden](https://github.com/stellirin/unifi-network-application)
 - **Supported architectures**: `amd64`
 
-## What is the UniFi Network Controller?
-
-The UniFi Network Controller is the front end for the UniFi Software-Defined Networking (SDN) platform, an end-to-end system of network devices across different locations.
-
-![UniFi Logo](https://upload.wikimedia.org/wikipedia/en/9/93/Ubiquiti_Networks_2016.svg)
+## Disclaimer
 
 This project is not an official container image, nor is it associated with Ubiquiti in any way. It was created by reverse engineering the original UniFi scripts.
 
-Motivation for this project comes from the limitations of the source DEB. Specifically, the DEB is restricted to use obsolete versions of MongoDB because of how the UniFi scripts connect to a locally installed DB. However, UniFi runs perfectly fine on even the latest MongoDB v5.0 when connecting to a 'remote' MongoDB installation (i.e. via URI instead of socket).
+Motivation for this project comes from the limitations of the source DEB. Specifically, the DEB is restricted to use obsolete versions of MongoDB because of how the UniFi scripts connect to a locally installed DB. However, UniFi runs perfectly fine with newer versions of MongoDB (currently up to v5.0) when connecting to a 'remote' MongoDB installation (i.e. via URI instead of socket).
 
-By default the controller will generate untrusted TLS certificates. This container can also use trusted certificates, for example from Let's Encrypt. The container will also watch any provided certificates for changes and trigger a restart.
+By default, the container will generate untrusted TLS certificates. This container can also use trusted certificates, for example from Let's Encrypt. The container will also watch any provided certificates for changes and trigger a restart.
 
 ### **TODO**
 
@@ -52,9 +51,9 @@ By default the controller will generate untrusted TLS certificates. This contain
 
 ## How to use this image
 
-This container image must be used in conjunction with an existing MongoDB installation. Despite the DEB provided by Ubiquiti being limited to MongoDB 3.6, the UniFi Network Controller works fine on the latest MongoDB 5.0 releases.
+This container image must be used in conjunction with an existing MongoDB installation. Despite the DEB provided by Ubiquiti being limited to MongoDB 3.6, the UniFi Network Application works fine with newer versions of MongoDB (currently up to v5.0).
 
-The simplest method is to use a MongoDB container image. See the [examples folder](https://github.com/stellirin/unifi-controller/tree/main/examples) for tested methods of running this image.
+The simplest method is to use a MongoDB container image. See the [examples folder](https://github.com/stellirin/unifi-network-application/tree/main/examples) for tested methods of running this image.
 
 ### Environment Variables
 
@@ -110,7 +109,7 @@ Default is to take the same value as `MONGO_DB_URI`.
 
 #### `UNIFI_HTTPS_PORT`
 
-The port used for the controller UI. By default a container runs without the required privileges to bind to the default HTTPS port. If your container runs with privileges you can change this to use port `443`.
+The port used for the application UI. By default, a container runs without the required privileges to bind to the default HTTPS port. If your container runs with privileges you can change this to use port `443`.
 
 Typically port `443` is achieved at the container platform level (bind external port `443` to internal port `8443`) but this is useful if you are using Docker with `--network="host"` and `--cap-add="NET_BIND_SERVICE"`.
 
@@ -147,7 +146,7 @@ No default value.
 As an alternative to passing sensitive information via environment variables, `_FILE` may be appended to some of the previously listed environment variables, causing the initialization script to load the values for those variables from files present in the container. In particular, this can be used to load passwords from secrets stored in `/run/secrets/<secret_name>` files. For example:
 
 ```sh
-docker run --name unifi-controller -e MONGO_DB_PASS_FILE=/run/secrets/mongo-db-password -d stellirin/unifi-controller:latest
+docker run --name unifi-network-application -e MONGO_DB_PASS_FILE=/run/secrets/mongo-db-password -d stellirin/unifi-network-application:latest
 ```
 
 Currently, this is only supported for `MONGO_DB_HOST`, `MONGO_DB_PORT`, `MONGO_DB_NAME`, `MONGO_DB_USER`, `MONGO_DB_PASS`, `MONGO_DB_URI`, and `MONGO_DB_STAT_URI`.

@@ -2,23 +2,22 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   namespace: unifi
-  name: controller
+  name: network-application
   labels:
-    app: controller
-
+    app: network-application
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: controller
+      app: network-application
   template:
     metadata:
       labels:
-        app: controller
+        app: network-application
     spec:
       containers:
-        - name: controller
-          image: ghcr.io/stellirin/unifi-controller:latest
+        - name: network-application
+          image: ghcr.io/stellirin/unifi-network-application:latest
           imagePullPolicy: Always
           ports:
             - name: discoverable
@@ -37,7 +36,7 @@ spec:
               hostPort: 8080
               containerPort: 8080
               protocol: TCP
-            - name: controller
+            - name: network-application
               hostPort: 8443
               containerPort: 8443
               protocol: TCP
@@ -70,13 +69,7 @@ spec:
                 secretKeyRef:
                   name: unifi-mongodb
                   key: MONGO_DB_PASS
-            # No, I'm not paranoid!
-            - name: LOG4J_FORMAT_MSG_NO_LOOKUPS
-              value: "true"
-            - name: JVM_EXTRA_OPTS
-              value: "-Dlog4j2.formatMsgNoLookups=true"
           volumeMounts:
-            # UniFi Controller storage volume
             - name: data
               mountPath: /var/lib/unifi
           resources:
@@ -85,8 +78,7 @@ spec:
               memory: 512Mi
             limits:
               memory: 1024Mi
-
-        # Controller storage
+      volumes:
         - name: data
           persistentVolumeClaim:
-            claimName: controller-pvc
+            claimName: network-application-pvc

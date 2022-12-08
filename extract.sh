@@ -5,8 +5,8 @@ UNIFI_VER=$1
 if [[ "${UNIFI_VER}" == "" ]]
 then
     echo
-    echo "    Specify a UniFi controller version! Example:"
-    echo "    $ $0 5.12.0"
+    echo "    Specify a UniFi Network Application version! Example:"
+    echo "    $ $0 7.3.76"
     echo
     echo "    Find new versions at https://community.ui.com/releases"
     echo
@@ -15,7 +15,7 @@ fi
 
 mkdir -p extract/${UNIFI_VER}
 
-wget -O extract/unifi.${UNIFI_VER}.deb https://dl.ui.com/unifi/${UNIFI_VER}/unifi_sysvinit_all.deb
+curl -o extract/unifi.${UNIFI_VER}.deb https://dl.ui.com/unifi/${UNIFI_VER}/unifi_sysvinit_all.deb
 
 pushd extract/${UNIFI_VER}
     ar -x ../unifi.${UNIFI_VER}.deb
