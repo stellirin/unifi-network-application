@@ -3,7 +3,7 @@
 #
 FROM ibm-semeru-runtimes:open-11-jre-jammy
 
-ARG UNIFI_VER=7.3.76
+ARG UNIFI_VER=7.3.83
 ARG UNIFI_URL=https://dl.ui.com/unifi/${UNIFI_VER}/unifi_sysvinit_all.deb
 ARG UNIFI_USER=10017
 
