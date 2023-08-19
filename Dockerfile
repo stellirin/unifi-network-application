@@ -3,7 +3,7 @@
 #
 FROM ibm-semeru-runtimes:open-11-jre-jammy
 
-ARG UNIFI_VER=7.3.83
+ARG UNIFI_VER=7.4.156
 ARG UNIFI_URL=https://dl.ui.com/unifi/${UNIFI_VER}/unifi_sysvinit_all.deb
 ARG UNIFI_USER=10017
 
@@ -21,8 +21,8 @@ RUN curl -L -o /unifi.deb ${UNIFI_URL} \
 
 # usr/lib/unifi/lib/ace.jar
 # sudo apt-get install binutils xz-utils
-# PROTIP: unzip -p usr/lib/unifi/lib/ace.jar log4j2.xml > log4j2.new.xml
-COPY log4j2.xml /usr/lib/unifi/
+# PROTIP: unzip -p usr/lib/unifi/lib/ace.jar logback.xml > logback.new.xml
+COPY logback.xml /usr/lib/unifi/
 
 COPY scripts/*.sh /
 

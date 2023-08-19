@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration>
+
+<configuration>
+
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+    <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
+
+    <variable name="logDir" value="${sys:logDir:-logs}"/>
+    <variable name="logPattern" value="[%date{ISO8601}] &lt;%thread&gt; %-5level %-6logger{0} - %message%n"/>
+
+    <appender name="server_log" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${logDir}/server.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+            <fileNamePattern>${logDir}/server.log.%i</fileNamePattern>
+            <minIndex>1</minIndex>
+            <maxIndex>3</maxIndex>
+        </rollingPolicy>
+
+        <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+            <maxFileSize>10MB</maxFileSize>
+        </triggeringPolicy>
+
+        <encoder>
+            <pattern>${logPattern}</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="migration_log" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${logDir}/migration.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+            <fileNamePattern>${logDir}/migration.log.%i</fileNamePattern>
+            <minIndex>1</minIndex>
+            <maxIndex>1</maxIndex>
+        </rollingPolicy>
+
+        <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+            <maxFileSize>10MB</maxFileSize>
+        </triggeringPolicy>
+
+        <encoder>
+            <pattern>${logPattern}</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="InMemoryAppender" class="com.ubnt.ace.logs.InMemoryAppender">
+        <encoder>
+            <pattern>${logPattern}</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="AnalyticsAppender" class="com.ubnt.service.trace.logerror.AnalyticsAppender">
+        <clock class="com.ubnt.service.trace.logerror.ReportClock"/>
+        <reportSender class="com.ubnt.service.trace.logerror.ReportSender">
+            <url>https://trace.svc.ui.com/traces</url>
+            <clock class="com.ubnt.service.trace.logerror.ReportClock"/>
+        </reportSender>
+        <fullCrashReportSender class="com.ubnt.service.trace.logerror.FullCrashReportSender"/>
+
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>ERROR</level>
+        </filter>
+        <filter class="com.ubnt.service.trace.logerror.ReportBurstFilter">
+            <clock class="com.ubnt.service.trace.logerror.ReportClock"/>
+        </filter>
+    </appender>
+
+    <logger name="java" level="ERROR" />
+    <logger name="javax" level="ERROR" />
+    <logger name="javax.jmdns" level="OFF" />
+    <logger name="sun" level="ERROR" />
+    <logger name="org.apache" level="WARN" />
+    <logger name="httpclient.wire" level="WARN" />
+    <logger name="net.schmizz" level="ERROR" />
+    <logger name="com.codahale" level="ERROR" />
+    <logger name="org.apache.tomcat" level="ERROR" />
+    <logger name="org.apache.commons" level="WARN" />
+    <logger name="org.apache.catalina" level="ERROR" />
+    <logger name="org.hibernate.validator" level="WARN" />
+    <logger name="com.mongodb" level="ERROR" />
+    <logger name="org.mongodb" level="ERROR" />
+
+    <logger name="org.springframework" level="WARN" />
+    <logger name="de.javawi.jstun" level="WARN" />
+
+    <logger name="com.ubnt" level="INFO" />
+    <logger name="com.ubiquiti" level="INFO" />
+
+    <logger name="com.amazonaws.internal" level="WARN" />
+    <logger name="springfox" level="WARN" />
+
+    <logger name="migration">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="migration_log"/>
+    </logger>
+
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="server_log"/>
+        <appender-ref ref="InMemoryAppender"/>
+        <appender-ref ref="AnalyticsAppender"/>
+    </root>
+
+</configuration>
