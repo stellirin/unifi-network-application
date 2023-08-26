@@ -99,6 +99,8 @@ spec:
               value: "/run/secrets/certificates/tls.crt"
             - name: UNIFI_TLS_PRIVKEY
               value: "/run/secrets/certificates/tls.key"
+            - name: JAVA_TOOL_OPTIONS
+              value: "--add-opens=java.base/java.io=ALL-UNNAMED --add-opens=java.base/java.lang=ALL-UNNAMED --add-opens=java.base/java.time=ALL-UNNAMED --add-opens=java.rmi/sun.rmi.transport=ALL-UNNAMED"
           volumeMounts:
             - name: data
               mountPath: /var/lib/unifi

@@ -1,7 +1,7 @@
 #
 # UniFi Network Application
 #
-FROM ibm-semeru-runtimes:open-11-jre-jammy
+FROM ibm-semeru-runtimes:open-17-jre-jammy
 
 ARG UNIFI_VER=7.4.162
 ARG UNIFI_URL=https://dl.ui.com/unifi/${UNIFI_VER}/unifi_sysvinit_all.deb
