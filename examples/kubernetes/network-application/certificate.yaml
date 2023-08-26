@@ -1,0 +1,14 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  namespace: unifi
+  name: unifi
+spec:
+  secretName: unifi-certificate
+  commonName: "unifi.example.com"
+  dnsNames:
+    - "unifi.example.com"
+  issuerRef:
+    group: cert-manager.io
+    kind: ClusterIssuer
+    name: letsencrypt

@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  namespace: unifi
+  namespace: mongodb
   name: mongodb-5.0
   labels:
     app: mongodb
@@ -24,26 +24,26 @@ spec:
           ]
           env:
             - name: MONGO_INITDB_DATABASE
-              value: "unifi"
+              value: unifi
             - name: MONGO_INITDB_ROOT_USERNAME
               valueFrom:
                 secretKeyRef:
-                  name: unifi-mongodb
+                  name: unifi
                   key: MONGO_INITDB_ROOT_USERNAME
             - name: MONGO_INITDB_ROOT_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: unifi-mongodb
+                  name: unifi
                   key: MONGO_INITDB_ROOT_PASSWORD
             - name: MONGO_DB_USER
               valueFrom:
                 secretKeyRef:
-                  name: unifi-mongodb
+                  name: unifi
                   key: MONGO_DB_USER
             - name: MONGO_DB_PASS
               valueFrom:
                 secretKeyRef:
-                  name: unifi-mongodb
+                  name: unifi
                   key: MONGO_DB_PASS
           volumeMounts:
             # MongoDB storage volume
@@ -51,8 +51,8 @@ spec:
               mountPath: /data/db
             # MongoDB init scripts
             - name: initdb
-              mountPath: /docker-entrypoint-initdb.d/01-admin.sh
-              subPath: 01-admin.sh
+              mountPath: /docker-entrypoint-initdb.d/admin.sh
+              subPath: admin.sh
             - name: initdb
               mountPath: /entrypoint.sh
               subPath: entrypoint.sh
@@ -72,9 +72,11 @@ spec:
           livenessProbe:
             exec:
               command:
-                - pgrep
-                - mongod
-            initialDelaySeconds: 30
+                - mongosh
+                - --quiet
+                - --eval
+                - "db.adminCommand('ping')"
+            initialDelaySeconds: 5
             periodSeconds: 10
             timeoutSeconds: 5
             successThreshold: 1
@@ -82,7 +84,8 @@ spec:
           readinessProbe:
             exec:
               command:
-                - mongo
+                - mongosh
+                - --quiet
                 - --eval
                 - "db.adminCommand('ping')"
             initialDelaySeconds: 5
@@ -99,21 +102,17 @@ spec:
               cpu: 100m
               memory: 1Gi
             limits:
-              cpu: 1000m
               memory: 1Gi
-
       volumes:
         - name: data
           persistentVolumeClaim:
             claimName: mongodb-5.0-pvc
-
-        # MongoDB init scripts
         - name: initdb
           configMap:
-            name: unifi-mongodb-initdb
+            name: unifi-initdb
             defaultMode: 0555
             items:
-              - key: 01_ADMIN_SH
-                path: 01-admin.sh
-              - key: ENTRYPOINT_INIT_SH
+              - key: admin.sh
+                path: admin.sh
+              - key: entrypoint.sh
                 path: entrypoint.sh

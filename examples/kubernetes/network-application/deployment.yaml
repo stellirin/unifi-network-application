@@ -10,16 +10,29 @@ spec:
   selector:
     matchLabels:
       app: network-application
+  strategy:
+    type: Recreate
   template:
     metadata:
       labels:
         app: network-application
     spec:
+      affinity:
+        nodeAffinity:
+          # Run on the master node
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: node-role.kubernetes.io/master
+                    operator: In
+                    values:
+                      - "true"
       containers:
         - name: network-application
           image: ghcr.io/stellirin/unifi-network-application:latest
           imagePullPolicy: Always
           ports:
+            # UniFi
             - name: discoverable
               hostPort: 1900
               containerPort: 1900
@@ -27,6 +40,10 @@ spec:
             - name: stun
               hostPort: 3478
               containerPort: 3478
+              protocol: UDP
+            - name: logging
+              hostPort: 5514
+              containerPort: 5514
               protocol: UDP
             - name: speed-test
               hostPort: 6789
@@ -36,42 +53,58 @@ spec:
               hostPort: 8080
               containerPort: 8080
               protocol: TCP
-            - name: network-application
+            - name: ui
               hostPort: 8443
               containerPort: 8443
-              protocol: TCP
-            - name: http-redirect
-              hostPort: 8880
-              containerPort: 8880
-              protocol: TCP
-            - name: https-redirect
-              hostPort: 8843
-              containerPort: 8843
               protocol: TCP
             - name: discovery
               hostPort: 10001
               containerPort: 10001
               protocol: UDP
+              # Portal
+            - name: http-redirect
+              hostPort: 8880
+              containerPort: 8880
+              protocol: TCP
+            - name: http-redirect1
+              hostPort: 8881
+              containerPort: 8881
+              protocol: TCP
+            - name: http-redirect2
+              hostPort: 8882
+              containerPort: 8882
+              protocol: TCP
+            - name: https-redirect
+              hostPort: 8843
+              containerPort: 8843
+              protocol: TCP
           env:
             - name: MONGO_DB_NAME
               value: "unifi"
             - name: MONGO_DB_HOST
-              value: "mongodb"
+              value: "mongodb.mongodb.svc"
             - name: MONGO_DB_PORT
               value: "27017"
             - name: MONGO_DB_USER
               valueFrom:
                 secretKeyRef:
-                  name: unifi-mongodb
+                  name: unifi
                   key: MONGO_DB_USER
             - name: MONGO_DB_PASS
               valueFrom:
                 secretKeyRef:
-                  name: unifi-mongodb
+                  name: unifi
                   key: MONGO_DB_PASS
+            - name: UNIFI_TLS_FULLCHAIN
+              value: "/run/secrets/certificates/tls.crt"
+            - name: UNIFI_TLS_PRIVKEY
+              value: "/run/secrets/certificates/tls.key"
           volumeMounts:
             - name: data
               mountPath: /var/lib/unifi
+            - name: certificates
+              readOnly: true
+              mountPath: "/run/secrets/certificates"
           resources:
             requests:
               cpu: 100m
@@ -81,4 +114,7 @@ spec:
       volumes:
         - name: data
           persistentVolumeClaim:
-            claimName: network-application-pvc
+            claimName: network-application
+        - name: certificates
+          secret:
+            secretName: unifi-certificate

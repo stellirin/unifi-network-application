@@ -7,8 +7,8 @@ networks:
 volumes:
   mongodb:
     name: unifi-mongodb
-  controller:
-    name: unifi-controller
+  network-application:
+    name: unifi-network-application
 
 services:
 
@@ -16,26 +16,24 @@ services:
     image: mongo:5.0
     container_name: unifi-mongodb
     volumes:
-      # MongoDB storage volume
       - type: volume
         source: mongodb
         target: /data/db
-      # MongoDB init scripts
       - type: bind
         read_only: true
-        source: ./01-admin.sh
-        target: /docker-entrypoint-initdb.d/01-admin.sh
+        source: ./admin.sh
+        target: /docker-entrypoint-initdb.d/admin.sh
 #      - type: bind
 #        read_only: true
-#        source: ./01-entrypoint.sh
-#        target: /01-entrypoint.sh
+#        source: ./entrypoint.sh
+#        target: /entrypoint.sh
 #    entrypoint:
-#      - /01-entrypoint.sh
+#      - /entrypoint.sh
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME:-admin}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD:-admin}
       MONGO_INITDB_DATABASE: ${MONGO_INITDB_DATABASE:-unifi}
-      # Not used by the MongoDB image but our custom init scripts
+      # Not used by the base MongoDB image but by the custom init scripts
       MONGO_DB_USER: ${MONGO_DB_USER:-unifi}
       MONGO_DB_PASS: ${MONGO_DB_PASS:-unifi}
 
@@ -43,19 +41,24 @@ services:
     depends_on:
       - mongodb
     image: ghcr.io/stellirin/unifi-network-application:${CONTROLLER_IMAGE_TAG:-latest}
-    container_name: unifi-controller
+    container_name: unifi-network-application
     ports:
+      # UniFi
       - "1900:1900/udp"
       - "3478:3478/udp"
+      - "5514:5514/udp"
       - "6789:6789/tcp"
       - "8080:8080/tcp"
       - "8443:8443/tcp"
-      - "8843:8843/tcp"
-      - "8880:8880/tcp"
       - "10001:10001/udp"
+      # Portal
+      - "8880:8880/tcp"
+      - "8881:8881/tcp"
+      - "8882:8882/tcp"
+      - "8843:8843/tcp"
     volumes:
       - type: volume
-        source: controller
+        source: network-application
         target: /var/lib/unifi
     environment:
       MONGO_DB_HOST: ${MONGO_DB_HOST:-mongodb}
