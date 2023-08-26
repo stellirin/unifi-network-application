@@ -24,6 +24,22 @@ file_env() {
 
 # Configure TLS
 set_tls_keystore() {
+    if [ -n "${UNIFI_CA_CERTIFICATE}" ] && [ -f "${UNIFI_CA_CERTIFICATE}" ]
+    then
+        if [ -n "${UNIFI_TLS_CERTIFICATE}" ] && [ -f "${UNIFI_TLS_CERTIFICATE}" ]
+        then
+            cat "${UNIFI_TLS_CERTIFICATE}" > /tmp/fullchain.pem
+            cat "${UNIFI_CA_CERTIFICATE}" >> /tmp/fullchain.pem
+            UNIFI_TLS_FULLCHAIN=/tmp/fullchain.pem
+        else
+            echo "ERROR: Path to TLS certificate supplied but file not found!"
+            exit 1
+        fi
+    else
+        echo "ERROR: Path to CA certificate supplied but file not found!"
+        exit 1
+    fi
+
     if [ -n "${UNIFI_TLS_FULLCHAIN}" ] && [ -n "${UNIFI_TLS_PRIVKEY}" ]
     then
         if [ -f "${UNIFI_TLS_FULLCHAIN}" ] && [ -f "${UNIFI_TLS_PRIVKEY}" ]

@@ -3,7 +3,7 @@
 HASH_CHECK=0
 
 # Get hashes of current TLS certificates
-sha256sum ${UNIFI_TLS_FULLCHAIN} ${UNIFI_TLS_PRIVKEY} > /tmp/cert.hash
+sha256sum ${UNIFI_CA_CERTIFICATE} ${UNIFI_TLS_CERTIFICATE} ${UNIFI_TLS_FULLCHAIN} ${UNIFI_TLS_PRIVKEY} > /tmp/cert.hash
 
 # No need for frequent checks, TLS certificates rarely change
 while [[ "${HASH_CHECK}" == "0" ]]

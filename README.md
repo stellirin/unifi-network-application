@@ -119,6 +119,18 @@ Typically port `443` is achieved at the container platform level (bind external 
 
 Default value is `8443`.
 
+#### `UNIFI_CA_CERTIFICATE`
+
+The path to a ca certificate that is used for TLS connections to the UI. If no value is supplied then UniFi will generate an untrusted certificate for testing purposes.
+
+No default value.
+
+#### `UNIFI_TLS_CERTIFICATE`
+
+The path to a tls certificate that is used for TLS connections to the UI. If no value is supplied then UniFi will generate an untrusted certificate for testing purposes.
+
+No default value.
+
 #### `UNIFI_TLS_FULLCHAIN`
 
 The path to a full chain certificate that is used for TLS connections to the UI. If no value is supplied then UniFi will generate an untrusted certificate for testing purposes.
