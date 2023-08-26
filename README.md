@@ -143,6 +143,14 @@ The path to a private key that is used for TLS connections to the UI. If no valu
 
 No default value.
 
+#### `UNIFI_PKCS12_KEYSTORE`
+
+The path to a PKCS12 keystore that is used for TLS connections to the UI. If no value is supplied then UniFi will generate an untrusted certificate for testing purposes.
+
+The keystore must have the password `unifi`.
+
+No default value.
+
 ### Advanced Environment Variables
 
 #### `JAVA_ENTROPY_GATHER_DEVICE`

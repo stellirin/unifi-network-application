@@ -24,34 +24,26 @@ file_env() {
 
 # Configure TLS
 set_tls_keystore() {
-    if [ -n "${UNIFI_CA_CERTIFICATE}" ] && [ -f "${UNIFI_CA_CERTIFICATE}" ]
+    if [ -n "${UNIFI_CA_CERTIFICATE}" ] && [ -n "${UNIFI_TLS_CERTIFICATE}" ]
     then
-        if [ -n "${UNIFI_TLS_CERTIFICATE}" ] && [ -f "${UNIFI_TLS_CERTIFICATE}" ]
+        if [ -f "${UNIFI_CA_CERTIFICATE}" ] && [ -f "${UNIFI_TLS_CERTIFICATE}" ]
         then
+            echo "INFO: Creating intermediate TLS full chain certificate ..."
             cat "${UNIFI_TLS_CERTIFICATE}" > /tmp/fullchain.pem
             cat "${UNIFI_CA_CERTIFICATE}" >> /tmp/fullchain.pem
+
             UNIFI_TLS_FULLCHAIN=/tmp/fullchain.pem
         else
-            echo "ERROR: Path to TLS certificate supplied but file not found!"
+            echo "ERROR: Path to TLS certificates supplied but file(s) not found!"
             exit 1
         fi
-    else
-        echo "ERROR: Path to CA certificate supplied but file not found!"
-        exit 1
     fi
 
     if [ -n "${UNIFI_TLS_FULLCHAIN}" ] && [ -n "${UNIFI_TLS_PRIVKEY}" ]
     then
         if [ -f "${UNIFI_TLS_FULLCHAIN}" ] && [ -f "${UNIFI_TLS_PRIVKEY}" ]
         then
-
-            if [ -f "/var/lib/unifi/keystore" ]
-            then
-                echo "INFO: Creating backup TLS keystore ..."
-                mv /var/lib/unifi/keystore /tmp/keystore.backup
-            fi
-
-            echo "INFO: Creating intermediate TLS keystore ..."
+            echo "INFO: Creating intermediate PKCS12 keystore ..."
             openssl pkcs12 \
                 -export \
                 -in ${UNIFI_TLS_FULLCHAIN} \
@@ -60,47 +52,49 @@ set_tls_keystore() {
                 -name ubnt \
                 -password pass:unifi
 
-            if [ -f "/tmp/keystore.p12" ]
+            UNIFI_PKCS12_KEYSTORE=/tmp/keystore.p12
+        else
+            echo "ERROR: Path to TLS certificates supplied but file(s) not found!"
+            exit 1
+        fi
+    fi
+
+    if [ -n "${UNIFI_PKCS12_KEYSTORE}" ]
+    then
+        if [ -f "${UNIFI_PKCS12_KEYSTORE}" ]
+        then
+
+            if [ -f "/var/lib/unifi/keystore" ]
             then
-                echo "INFO: Creating final keystore ..."
-                keytool \
-                    -noprompt \
-                    -importkeystore \
-                    -srckeystore /tmp/keystore.p12 \
-                    -srcstoretype PKCS12 \
-                    -srcstorepass unifi \
-                    -destkeystore /tmp/keystore \
-                    -deststorepass aircontrolenterprise \
-                    -destkeypass aircontrolenterprise \
-                    -alias ubnt
-            else
-                echo "ERROR: Intermediate TLS keystore not created!"
-                if [ -f "/tmp/keystore.backup" ]
-                then
-                    echo "INFO: Restoring backup TLS keystore"
-                    mv /tmp/keystore.backup /var/lib/unifi/keystore
-                fi
-                exit 1
+                echo "INFO: Creating backup TLS keystore ..."
+                mv /var/lib/unifi/keystore /tmp/keystore.backup
             fi
 
-            if [ -f "/tmp/keystore" ]
+            echo "INFO: Creating final keystore ..."
+            keytool \
+                -noprompt \
+                -importkeystore \
+                -srckeystore ${UNIFI_PKCS12_KEYSTORE} \
+                -srcstoretype PKCS12 \
+                -srcstorepass unifi \
+                -destkeystore /var/lib/unifi/keystore \
+                -deststorepass aircontrolenterprise \
+                -destkeypass aircontrolenterprise \
+                -alias ubnt
+
+            if [ -f "/var/lib/unifi/keystore" ]
             then
                 echo "INFO: Final TLS keystore created"
-                rm -f /tmp/keystore.p12
                 if [ -f "/tmp/keystore.backup" ]
                 then
                     echo "INFO: Removing backup TLS keystore"
                     rm -f /tmp/keystore.backup
                 fi
 
-                echo "INFO: Moving final TLS keystore"
-                mv /tmp/keystore /var/lib/unifi/keystore
-
                 # Certificates installed, watch for changes
                 /certwatch.sh &
             else
                 echo "ERROR: Final TLS keystore not created!"
-                rm -f /tmp/keystore.p12
                 if [ -f "/tmp/keystore.backup" ]
                 then
                     echo "INFO: Restoring backup TLS keystore"
@@ -109,7 +103,7 @@ set_tls_keystore() {
                 exit 1
             fi
         else
-            echo "ERROR: Path to certificates supplied but file(s) not found!"
+            echo "ERROR: Path to PKCS12 keystore supplied but file not found!"
             exit 1
         fi
     fi
