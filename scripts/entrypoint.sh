@@ -9,7 +9,7 @@ file_env() {
     local fileVar="${var}_FILE"
     local def="${2:-}"
     if [ "${!var:-}" ] && [ "${!fileVar:-}" ]; then
-        echo >&2 "error: both $var and $fileVar are set (but are exclusive)"
+        echo >&2 "ERROR: both $var and $fileVar are set but are exclusive"
         exit 1
     fi
     local val="$def"
@@ -26,86 +26,83 @@ file_env() {
 set_tls_keystore() {
     if [ -n "${UNIFI_CA_CERTIFICATE}" ] && [ -n "${UNIFI_TLS_CERTIFICATE}" ]
     then
-        if [ -f "${UNIFI_CA_CERTIFICATE}" ] && [ -f "${UNIFI_TLS_CERTIFICATE}" ]
+        if [ ! -f "${UNIFI_CA_CERTIFICATE}" ]
         then
-            echo "INFO: Creating intermediate TLS full chain certificate ..."
-            cat "${UNIFI_TLS_CERTIFICATE}" > /tmp/fullchain.pem
-            cat "${UNIFI_CA_CERTIFICATE}" >> /tmp/fullchain.pem
-
-            UNIFI_TLS_FULLCHAIN=/tmp/fullchain.pem
-        else
-            echo "ERROR: Path to TLS certificates supplied but file(s) not found!"
+            echo "ERROR: path to CA certificate supplied but file not found"
             exit 1
         fi
+
+        if [ ! -f "${UNIFI_TLS_CERTIFICATE}" ]
+        then
+            echo "ERROR: path to TLS certificate supplied but file not found"
+            exit 1
+        fi
+
+        echo "INFO: creating intermediate TLS full chain certificate"
+        cat "${UNIFI_TLS_CERTIFICATE}" > /tmp/fullchain.pem
+        cat "${UNIFI_CA_CERTIFICATE}" >> /tmp/fullchain.pem
+
+        UNIFI_TLS_FULLCHAIN=/tmp/fullchain.pem
     fi
 
     if [ -n "${UNIFI_TLS_FULLCHAIN}" ] && [ -n "${UNIFI_TLS_PRIVKEY}" ]
     then
-        if [ -f "${UNIFI_TLS_FULLCHAIN}" ] && [ -f "${UNIFI_TLS_PRIVKEY}" ]
+        if [ ! -f "${UNIFI_TLS_FULLCHAIN}" ]
         then
-            echo "INFO: Creating intermediate PKCS12 keystore ..."
-            openssl pkcs12 \
-                -export \
-                -in ${UNIFI_TLS_FULLCHAIN} \
-                -inkey ${UNIFI_TLS_PRIVKEY} \
-                -out /tmp/keystore.p12 \
-                -name ubnt \
-                -password pass:unifi
-
-            UNIFI_PKCS12_KEYSTORE=/tmp/keystore.p12
-        else
-            echo "ERROR: Path to TLS certificates supplied but file(s) not found!"
+            echo "ERROR: path to full chain of TLS certificates supplied but file not found"
             exit 1
         fi
+
+        if [ ! -f "${UNIFI_TLS_PRIVKEY}" ]
+        then
+            echo "ERROR: path to TLS private key supplied but file not found"
+            exit 1
+        fi
+
+        echo "INFO: creating intermediate PKCS12 keystore"
+        openssl pkcs12 \
+            -export \
+            -in ${UNIFI_TLS_FULLCHAIN} \
+            -inkey ${UNIFI_TLS_PRIVKEY} \
+            -out /tmp/keystore.p12 \
+            -name ubnt \
+            -password pass:unifi
+
+        UNIFI_PKCS12_KEYSTORE=/tmp/keystore.p12
     fi
 
     if [ -n "${UNIFI_PKCS12_KEYSTORE}" ]
     then
-        if [ -f "${UNIFI_PKCS12_KEYSTORE}" ]
+        if [ ! -f "${UNIFI_PKCS12_KEYSTORE}" ]
         then
-
-            if [ -f "/var/lib/unifi/keystore" ]
-            then
-                echo "INFO: Creating backup TLS keystore ..."
-                mv /var/lib/unifi/keystore /tmp/keystore.backup
-            fi
-
-            echo "INFO: Creating final keystore ..."
-            keytool \
-                -noprompt \
-                -importkeystore \
-                -srckeystore ${UNIFI_PKCS12_KEYSTORE} \
-                -srcstoretype PKCS12 \
-                -srcstorepass unifi \
-                -destkeystore /var/lib/unifi/keystore \
-                -deststorepass aircontrolenterprise \
-                -destkeypass aircontrolenterprise \
-                -alias ubnt
-
-            if [ -f "/var/lib/unifi/keystore" ]
-            then
-                echo "INFO: Final TLS keystore created"
-                if [ -f "/tmp/keystore.backup" ]
-                then
-                    echo "INFO: Removing backup TLS keystore"
-                    rm -f /tmp/keystore.backup
-                fi
-
-                # Certificates installed, watch for changes
-                /certwatch.sh &
-            else
-                echo "ERROR: Final TLS keystore not created!"
-                if [ -f "/tmp/keystore.backup" ]
-                then
-                    echo "INFO: Restoring backup TLS keystore"
-                    mv /tmp/keystore.backup /var/lib/unifi/keystore
-                fi
-                exit 1
-            fi
-        else
-            echo "ERROR: Path to PKCS12 keystore supplied but file not found!"
+            echo "ERROR: path to intermediate PKCS12 keystore supplied but file not found"
             exit 1
         fi
+
+        rm -f /var/lib/unifi/keystore
+
+        echo "INFO: creating final TLS keystore"
+        keytool \
+            -noprompt \
+            -importkeystore \
+            -srckeystore ${UNIFI_PKCS12_KEYSTORE} \
+            -srcstoretype PKCS12 \
+            -srcstorepass unifi \
+            -destkeystore /var/lib/unifi/keystore \
+            -deststorepass aircontrolenterprise \
+            -destkeypass aircontrolenterprise \
+            -alias ubnt
+
+        if [ ! -f "/var/lib/unifi/keystore" ]
+        then
+            echo "ERROR: final TLS keystore not created"
+            exit 1
+        fi
+
+        echo "INFO: final TLS keystore created"
+
+        # Certificates installed, watch for changes
+        /certwatch.sh &
     fi
 }
 
@@ -203,7 +200,7 @@ set_system_property "unifi.db.name=${MONGO_DB_NAME}"
 
 set_system_property "unifi.https.port=${UNIFI_HTTPS_PORT:-"8443"}"
 set_system_property "unifi.https.sslEnabledProtocols=+TLSv1.2"
-set_system_property "unifi.https.ciphers=TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA,TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA,TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256,TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA384,TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA,TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA,TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256,TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384,TLS_DHE_RSA_WITH_AES_128_GCM_SHA256,TLS_DHE_RSA_WITH_AES_256_GCM_SHA384,TLS_DHE_RSA_WITH_AES_128_CBC_SHA,TLS_DHE_RSA_WITH_AES_256_CBC_SHA,TLS_DHE_RSA_WITH_AES_128_CBC_SHA256,TLS_DHE_RSA_WITH_AES_256_CBC_SHA256"
+set_system_property "unifi.https.ciphers=TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256,TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA384,TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256,TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384,TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,TLS_DHE_RSA_WITH_AES_128_CBC_SHA256,TLS_DHE_RSA_WITH_AES_128_GCM_SHA256,TLS_DHE_RSA_WITH_AES_256_CBC_SHA256,TLS_DHE_RSA_WITH_AES_256_GCM_SHA384"
 
 set_jvm_extra_opts "file.encoding=UTF-8"
 set_jvm_extra_opts "java.awt.headless=true"
