@@ -4,9 +4,6 @@
 <configuration>
 
     <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
-    <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
-
-    <statusListener class="ch.qos.logback.core.status.NopStatusListener" />
 
     <variable name="logDir" value="${logDir:-logs}"/>
     <variable name="logPattern" value="[%date{ISO8601}] &lt;%thread&gt; %-5level %-6logger{0} - %message%n"/>
@@ -90,6 +87,16 @@
         </filter>
     </appender>
 
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>${CONSOLE_LOG_THRESHOLD:-INFO}</level>
+        </filter>
+        <encoder>
+            <pattern>${CONSOLE_LOG_PATTERN}</pattern>
+            <charset>${CONSOLE_LOG_CHARSET}</charset>
+        </encoder>
+    </appender>
+
     <logger name="java" level="ERROR" />
     <logger name="javax" level="ERROR" />
     <logger name="javax.jmdns" level="OFF" />
@@ -119,6 +126,7 @@
         <appender-ref ref="migration_log"/>
     </logger>
     <logger name="tasks">
+        <appender-ref ref="CONSOLE"/>
         <appender-ref ref="tasks_log"/>
     </logger>
     <root level="INFO">
