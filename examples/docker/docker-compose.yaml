@@ -19,10 +19,10 @@ services:
       - type: volume
         source: mongodb
         target: /data/db
-      - type: bind
-        read_only: true
-        source: ./admin.sh
-        target: /docker-entrypoint-initdb.d/admin.sh
+#      - type: bind
+#        read_only: true
+#        source: ./admin.sh
+#        target: /docker-entrypoint-initdb.d/admin.sh
 #      - type: bind
 #        read_only: true
 #        source: ./entrypoint.sh

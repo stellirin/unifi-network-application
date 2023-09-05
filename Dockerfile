@@ -1,7 +1,7 @@
 #
 # UniFi Network Application
 #
-FROM ibm-semeru-runtimes:open-17-jre-jammy
+FROM bellsoft/liberica-openjre-debian:17
 
 ARG UNIFI_VER=7.4.162
 ARG UNIFI_URL=https://dl.ui.com/unifi/${UNIFI_VER}/unifi_sysvinit_all.deb
@@ -28,7 +28,7 @@ COPY scripts/*.sh /
 
 # https://github.com/moby/moby/issues/38710
 # Set permissions on folders, add default user to /etc/passwd
-RUN echo "unifi:x:${UNIFI_USER}:0:unifi:${BASEDIR}:/usr/sbin/nologin" >> /etc/passwd \
+RUN useradd -u ${UNIFI_USER} -g root -d ${BASEDIR} -s /usr/sbin/nologin -c unifi -M -N unifi \
     && mkdir -p ${DATADIR} \
     && chmod g=u ${DATADIR} \
     && ln -s ${DATADIR} ${BASEDIR}/data \
