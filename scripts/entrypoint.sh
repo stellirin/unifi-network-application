@@ -133,6 +133,9 @@ set_system_property() {
     fi
 }
 
+JVM_EXTRA_OPTS=
+JVM_MAX_HEAP_SIZE=${JVM_MAX_HEAP_SIZE:-"1024M"}
+
 # Set up the UniFi JVM options
 set_jvm_extra_opts() {
     option=$(echo $1 | cut -d '=' -f 1)
@@ -141,9 +144,12 @@ set_jvm_extra_opts() {
     JVM_EXTRA_OPTS="${JVM_EXTRA_OPTS} -D${option}=${value}"
 }
 
+UNIFI_JVM_OPTS="-XX:+UseParallelGC -XX:+ExitOnOutOfMemoryError -XX:+CrashOnOutOfMemoryError -XX:ErrorFile=/var/lib/unifi/logs/hs_err_pid%p.log -Xlog:gc:logs/gc.log:time:filecount=2,filesize=5M"
+UNIFI_JVM_ADD_OPENS="--add-opens=java.base/java.io=ALL-UNNAMED --add-opens=java.base/java.lang=ALL-UNNAMED --add-opens=java.base/java.time=ALL-UNNAMED --add-opens=java.base/sun.security.util=ALL-UNNAMED --add-opens=java.rmi/sun.rmi.transport=ALL-UNNAMED"
+
 # Start UniFi
 unifi_start() {
-    JVM_OPTS="${JVM_EXTRA_OPTS} -Xmx${JVM_MAX_HEAP_SIZE} ${UNIFI_JVM_EXTRA_OPTS}"
+    JVM_OPTS="-Xmx${JVM_MAX_HEAP_SIZE} ${UNIFI_JVM_OPTS} ${UNIFI_JVM_ADD_OPENS} ${JVM_EXTRA_OPTS} ${UNIFI_JVM_EXTRA_OPTS}"
     java ${JVM_OPTS} -jar ${BASEDIR}/lib/ace.jar start &
 
     # Return code is UniFi PID
@@ -152,7 +158,7 @@ unifi_start() {
 
 # Stop UniFi
 unifi_stop() {
-    JVM_OPTS="${JVM_EXTRA_OPTS} -Xmx${JVM_MAX_HEAP_SIZE} ${UNIFI_JVM_EXTRA_OPTS}"
+    JVM_OPTS="-Xmx${JVM_MAX_HEAP_SIZE} ${UNIFI_JVM_OPTS} ${UNIFI_JVM_ADD_OPENS} ${JVM_EXTRA_OPTS} ${UNIFI_JVM_EXTRA_OPTS}"
     java ${JVM_OPTS} -jar ${BASEDIR}/lib/ace.jar stop
 
     # Container exit code is UniFi exit code
@@ -161,9 +167,6 @@ unifi_stop() {
 
 # Ensure files are written as writable by all users in the root group
 umask 002
-
-JVM_EXTRA_OPTS=
-JVM_MAX_HEAP_SIZE=${JVM_MAX_HEAP_SIZE:-"1024M"}
 
 file_env 'MONGO_DB_USER'
 file_env 'MONGO_DB_PASS'

@@ -6,7 +6,9 @@
     <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
     <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
 
-    <variable name="logDir" value="${sys:logDir:-logs}"/>
+    <statusListener class="ch.qos.logback.core.status.NopStatusListener" />
+
+    <variable name="logDir" value="${logDir:-logs}"/>
     <variable name="logPattern" value="[%date{ISO8601}] &lt;%thread&gt; %-5level %-6logger{0} - %message%n"/>
 
     <appender name="server_log" class="ch.qos.logback.core.rolling.RollingFileAppender">
@@ -20,6 +22,8 @@
         <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
             <maxFileSize>10MB</maxFileSize>
         </triggeringPolicy>
+
+        <filter class="com.ubnt.ace.logs.EffectiveLogLevelFilter"/>
 
         <encoder>
             <pattern>${logPattern}</pattern>
@@ -43,7 +47,28 @@
         </encoder>
     </appender>
 
+    <appender name="tasks_log" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${logDir}/tasks.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+            <fileNamePattern>${logDir}/tasks.log.%i</fileNamePattern>
+            <minIndex>1</minIndex>
+            <maxIndex>1</maxIndex>
+        </rollingPolicy>
+
+        <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+            <maxFileSize>500KB</maxFileSize>
+        </triggeringPolicy>
+
+        <encoder>
+            <pattern>${logPattern}</pattern>
+        </encoder>
+    </appender>
+
+    <turboFilter class="com.ubnt.ace.logs.OverwriteLogLevelFilter" />
+
     <appender name="InMemoryAppender" class="com.ubnt.ace.logs.InMemoryAppender">
+        <filter class="com.ubnt.ace.logs.EffectiveLogLevelFilter"/>
+
         <encoder>
             <pattern>${logPattern}</pattern>
         </encoder>
@@ -93,12 +118,14 @@
         <appender-ref ref="CONSOLE"/>
         <appender-ref ref="migration_log"/>
     </logger>
-
+    <logger name="tasks">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="tasks_log"/>
+    </logger>
     <root level="INFO">
         <appender-ref ref="CONSOLE"/>
         <appender-ref ref="server_log"/>
         <appender-ref ref="InMemoryAppender"/>
         <appender-ref ref="AnalyticsAppender"/>
     </root>
-
 </configuration>

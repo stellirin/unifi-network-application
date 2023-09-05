@@ -3,7 +3,7 @@
 #
 FROM bellsoft/liberica-openjre-debian:17
 
-ARG UNIFI_VER=7.4.162
+ARG UNIFI_VER=7.5.174
 ARG UNIFI_URL=https://dl.ui.com/unifi/${UNIFI_VER}/unifi_sysvinit_all.deb
 ARG UNIFI_USER=10017
 
@@ -22,7 +22,8 @@ RUN curl -L -o /unifi.deb ${UNIFI_URL} \
 # usr/lib/unifi/lib/ace.jar
 # sudo apt-get install binutils xz-utils
 # PROTIP: unzip -p usr/lib/unifi/lib/ace.jar logback.xml > logback.new.xml
-COPY logback.xml /usr/lib/unifi/
+# PROTIP: unzip -p usr/lib/unifi/lib/ace.jar logback-access.xml > logback-access.new.xml
+COPY logback/*.xml /usr/lib/unifi/
 
 COPY scripts/*.sh /
 

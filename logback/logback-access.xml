@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <variable name="logDir" value="${logDir:-logs}"/>
+    <variable name="logPattern" value="[%date{ISO8601}] %protocol[%remoteIP] %elapsedTime{}ms %statusCode %requestMethod %requestURI%queryString"/>
+
+    <appender name="access_log" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${logDir}/access.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+            <fileNamePattern>${logDir}/access.log.%i</fileNamePattern>
+            <minIndex>1</minIndex>
+            <maxIndex>1</maxIndex>
+        </rollingPolicy>
+
+        <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+            <maxFileSize>10MB</maxFileSize>
+        </triggeringPolicy>
+
+        <encoder>
+            <pattern>${logPattern}</pattern>
+        </encoder>
+    </appender>
+    <appender-ref ref="access_log"/>
+</configuration>
