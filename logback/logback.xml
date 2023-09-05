@@ -118,8 +118,7 @@
         <appender-ref ref="CONSOLE"/>
         <appender-ref ref="migration_log"/>
     </logger>
-    <logger name="tasks" level="INFO">
-        <appender-ref ref="CONSOLE"/>
+    <logger name="tasks">
         <appender-ref ref="tasks_log"/>
     </logger>
     <root level="INFO">
