@@ -2,7 +2,6 @@
 <!DOCTYPE configuration>
 
 <configuration>
-
     <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
 
     <variable name="logDir" value="${logDir:-logs}"/>
@@ -48,6 +47,23 @@
         <file>${logDir}/tasks.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
             <fileNamePattern>${logDir}/tasks.log.%i</fileNamePattern>
+            <minIndex>1</minIndex>
+            <maxIndex>1</maxIndex>
+        </rollingPolicy>
+
+        <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+            <maxFileSize>500KB</maxFileSize>
+        </triggeringPolicy>
+
+        <encoder>
+            <pattern>${logPattern}</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="hotspot_log" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${logDir}/hotspot.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+            <fileNamePattern>${logDir}/hotspot.log.%i</fileNamePattern>
             <minIndex>1</minIndex>
             <maxIndex>1</maxIndex>
         </rollingPolicy>
@@ -128,6 +144,10 @@
     <logger name="tasks">
         <appender-ref ref="CONSOLE"/>
         <appender-ref ref="tasks_log"/>
+    </logger>
+    <logger name="guest">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="hotspot_log"/>
     </logger>
     <root level="INFO">
         <appender-ref ref="CONSOLE"/>

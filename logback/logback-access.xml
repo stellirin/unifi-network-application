@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-
     <variable name="logDir" value="${logDir:-logs}"/>
     <variable name="logPattern" value="[%date{ISO8601}] %protocol[%remoteIP] %elapsedTime{}ms %statusCode %requestMethod %requestURI%queryString"/>
 
