@@ -13,7 +13,7 @@ volumes:
 services:
 
   mongodb:
-    image: mongo:5.0
+    image: mongo:7.0
     container_name: unifi-mongodb
     volumes:
       - type: volume

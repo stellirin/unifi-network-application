@@ -2,22 +2,22 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   namespace: mongodb
-  name: mongodb-5.0
+  name: mongodb-7
   labels:
-    app: mongodb
+    app: mongodb-7
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: mongodb
+      app: mongodb-7
   template:
     metadata:
       labels:
-        app: mongodb
+        app: mongodb-7
     spec:
       initContainers:
         - name: mongo-init
-          image: mongo:5.0
+          image: mongo:7.0
           imagePullPolicy: Always
           command: [
             "/entrypoint.sh",
@@ -59,7 +59,7 @@ spec:
 
       containers:
         - name: mongo
-          image: mongo:5.0
+          image: mongo:7.0
           imagePullPolicy: Always
           args: [
             "mongod",
@@ -106,7 +106,7 @@ spec:
       volumes:
         - name: data
           persistentVolumeClaim:
-            claimName: mongodb-5.0-pvc
+            claimName: mongodb-7.0-pvc
         - name: initdb
           configMap:
             name: unifi-initdb

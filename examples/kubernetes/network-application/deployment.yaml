@@ -85,7 +85,7 @@ spec:
             - name: MONGO_DB_NAME
               value: "unifi"
             - name: MONGO_DB_HOST
-              value: "mongodb.mongodb.svc"
+              value: "mongodb-7.mongodb.svc"
             - name: MONGO_DB_PORT
               value: "27017"
             - name: MONGO_DB_USER

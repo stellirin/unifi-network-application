@@ -1,7 +1,7 @@
 #!/bin/bash
 
 create_user() {
-    mongo admin \
+    mongosh admin \
         --host localhost \
         --eval "db.createUser($1);"
 }

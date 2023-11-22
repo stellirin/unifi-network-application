@@ -48,9 +48,9 @@ NOTE: `latest` may contain a beta release. If you wish for stability use a speci
 
 This project is not an official container image, nor is it associated with Ubiquiti in any way. It was created by reverse engineering the original UniFi scripts.
 
-Motivation for this project comes from the limitations of the source DEB. Specifically, the DEB is restricted to use obsolete versions of MongoDB because of how the UniFi scripts connect to a locally installed DB. However, UniFi runs perfectly fine with newer versions of MongoDB (currently up to v5.0) when connecting to a 'remote' MongoDB installation (i.e. via URI instead of socket).
+Motivation for this project comes from the limitations of the source DEB. Specifically, the DEB is restricted to use obsolete versions of MongoDB because of how the UniFi scripts connect to a locally installed DB. However, UniFi runs perfectly fine with newer versions of MongoDB (currently tested up to v7.0) when connecting to a 'remote' MongoDB installation (i.e. via URI instead of socket).
 
-By default, the container will generate untrusted TLS certificates. This container can also use trusted certificates, for example from Let's Encrypt. The container will also watch any provided certificates for changes and trigger a restart.
+By default, the container will generate untrusted TLS certificates. This container can also use trusted certificates, for example from Cert Manager or Let's Encrypt. The container will also watch any provided certificates for changes and trigger a restart.
 
 ### **TODO**
 
@@ -58,7 +58,7 @@ By default, the container will generate untrusted TLS certificates. This contain
 
 ## How to use this image
 
-This container image must be used in conjunction with an existing MongoDB installation. Despite the DEB provided by Ubiquiti being limited to MongoDB 3.6, the UniFi Network Application works fine with newer versions of MongoDB (currently up to v5.0).
+This container image must be used in conjunction with an existing MongoDB installation. Despite the DEB provided by Ubiquiti being limited to MongoDB 3.6, the UniFi Network Application works fine with newer versions of MongoDB (currently tested up to v7.0).
 
 The simplest method is to use a MongoDB container image. See the [examples folder](https://github.com/stellirin/unifi-network-application/tree/main/examples) for tested methods of running this image.
 
