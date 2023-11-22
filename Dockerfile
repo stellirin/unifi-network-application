@@ -1,7 +1,7 @@
 #
 # UniFi Network Application
 #
-ARG IMAGE_TAG=21
+ARG IMAGE_TAG=17
 FROM ghcr.io/bell-sw/liberica-openjre-debian:${IMAGE_TAG} as installer
 
 ARG UNIFI_VER=8.0.7
