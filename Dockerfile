@@ -4,7 +4,7 @@
 ARG IMAGE_TAG=21
 FROM ghcr.io/bell-sw/liberica-openjre-debian:${IMAGE_TAG} as installer
 
-ARG UNIFI_VER=7.5.187
+ARG UNIFI_VER=8.0.7
 ARG UNIFI_URL=https://dl.ui.com/unifi/${UNIFI_VER}/unifi_sysvinit_all.deb
 
 ARG DEBIAN_FRONTEND=noninteractive

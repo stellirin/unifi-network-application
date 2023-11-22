@@ -5,12 +5,13 @@ Build powerful home and enterprise networks with high-performance UniFi Switches
 ## Supported tags and respective `Dockerfile` links
 
 - [`latest`](https://github.com/stellirin/unifi-network-application/blob/main/Dockerfile)
-- [`7.5, 7.5.187`](https://github.com/stellirin/unifi-network-application/blob/v7.5.187/Dockerfile)
+- [`8.0, 8.0.7`](https://github.com/stellirin/unifi-network-application/blob/v8.0.7/Dockerfile)
 
 NOTE: `latest` may contain a beta release. If you wish for stability use a specific tag!
 
 ## Unsupported tags
 
+- [`7.5, 7.5.187`](https://github.com/stellirin/unifi-network-application/blob/v7.5.187/Dockerfile)
 - [`7.5.174`](https://github.com/stellirin/unifi-network-application/blob/v7.5.174/Dockerfile)
 - [`7.4, 7.4.162`](https://github.com/stellirin/unifi-network-application/blob/v7.4.162/Dockerfile)
 - [`7.4.156`](https://github.com/stellirin/unifi-network-application/blob/v7.4.156/Dockerfile)
