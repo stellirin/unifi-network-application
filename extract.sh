@@ -24,3 +24,6 @@ pushd extract/${UNIFI_VER}
 popd
 
 rm -f unifi.${UNIFI_VER}.deb
+
+unzip -p extract/${UNIFI_VER}/usr/lib/unifi/lib/ace.jar logback.xml > logback.new.xml
+unzip -p extract/${UNIFI_VER}/usr/lib/unifi/lib/ace.jar logback-access.xml > logback-access.new.xml
