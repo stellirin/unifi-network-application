@@ -19,7 +19,25 @@
             <maxFileSize>10MB</maxFileSize>
         </triggeringPolicy>
 
+        <filter class="com.ubnt.ace.logs.SkipLoggersPrintingToDedicatedFileOnly"/>
         <filter class="com.ubnt.ace.logs.EffectiveLogLevelFilter"/>
+
+        <encoder>
+            <pattern>${logPattern}</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="state_log" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${logDir}/state.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+            <fileNamePattern>${logDir}/state.log.%i</fileNamePattern>
+            <minIndex>1</minIndex>
+            <maxIndex>1</maxIndex>
+        </rollingPolicy>
+
+        <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+            <maxFileSize>5MB</maxFileSize>
+        </triggeringPolicy>
 
         <encoder>
             <pattern>${logPattern}</pattern>
@@ -71,6 +89,33 @@
         <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
             <maxFileSize>500KB</maxFileSize>
         </triggeringPolicy>
+
+        <encoder>
+            <pattern>${logPattern}</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="inform_request_log" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${logDir}/inform_request.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+            <fileNamePattern>${logDir}/inform_request.log.%i</fileNamePattern>
+            <minIndex>1</minIndex>
+            <maxIndex>3</maxIndex>
+        </rollingPolicy>
+
+        <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+            <maxFileSize>10MB</maxFileSize>
+        </triggeringPolicy>
+
+        <encoder>
+            <pattern>${logPattern}</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="startup_log" class="ch.qos.logback.core.FileAppender">
+        <file>${logDir}/startup.log</file>
+        <append>false</append>
+        <immediateFlush>true</immediateFlush>
 
         <encoder>
             <pattern>${logPattern}</pattern>
@@ -137,6 +182,10 @@
     <logger name="com.amazonaws.internal" level="WARN" />
     <logger name="springfox" level="WARN" />
 
+    <logger name="state">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="state_log"/>
+    </logger>
     <logger name="migration">
         <appender-ref ref="CONSOLE"/>
         <appender-ref ref="migration_log"/>
@@ -148,6 +197,14 @@
     <logger name="guest">
         <appender-ref ref="CONSOLE"/>
         <appender-ref ref="hotspot_log"/>
+    </logger>
+    <logger name="inform_request">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="inform_request_log"/>
+    </logger>
+    <logger name="startup">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="startup_log"/>
     </logger>
     <root level="INFO">
         <appender-ref ref="CONSOLE"/>
