@@ -191,7 +191,7 @@
         <appender-ref ref="migration_log"/>
     </logger>
     <logger name="tasks">
-        <appender-ref ref="CONSOLE"/>
+    <!--<appender-ref ref="CONSOLE"/>-->
         <appender-ref ref="tasks_log"/>
     </logger>
     <logger name="guest">
