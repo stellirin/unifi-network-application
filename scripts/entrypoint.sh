@@ -65,7 +65,7 @@ set_tls_keystore() {
             -in ${UNIFI_TLS_FULLCHAIN} \
             -inkey ${UNIFI_TLS_PRIVKEY} \
             -out /tmp/keystore.p12 \
-            -name ubnt \
+            -name unifi \
             -password pass:unifi
 
         UNIFI_PKCS12_KEYSTORE=/tmp/keystore.p12
@@ -91,7 +91,7 @@ set_tls_keystore() {
             -destkeystore /var/lib/unifi/keystore \
             -deststorepass aircontrolenterprise \
             -destkeypass aircontrolenterprise \
-            -alias ubnt
+            -alias unifi
 
         if [ ! -f "/var/lib/unifi/keystore" ]
         then
@@ -144,7 +144,7 @@ set_jvm_extra_opts() {
     JVM_EXTRA_OPTS="${JVM_EXTRA_OPTS} -D${option}=${value}"
 }
 
-UNIFI_JVM_OPTS="-XX:+UseParallelGC -XX:+ExitOnOutOfMemoryError -XX:+CrashOnOutOfMemoryError -XX:ErrorFile=/var/lib/unifi/logs/hs_err_pid%p.log -Xlog:gc:logs/gc.log:time:filecount=2,filesize=5M"
+UNIFI_JVM_OPTS="-XX:+UseParallelGC -XX:+ExitOnOutOfMemoryError -XX:+CrashOnOutOfMemoryError -XX:ErrorFile=/usr/lib/unifi/logs/unifi_crash.log -Xlog:gc:logs/gc.log:time:filecount=2,filesize=5M"
 UNIFI_JVM_ADD_OPENS="--add-opens=java.base/java.io=ALL-UNNAMED --add-opens=java.base/java.lang=ALL-UNNAMED --add-opens=java.base/java.time=ALL-UNNAMED --add-opens=java.base/sun.security.util=ALL-UNNAMED --add-opens=java.rmi/sun.rmi.transport=ALL-UNNAMED"
 
 # Start UniFi
